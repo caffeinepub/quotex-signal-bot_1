@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Font Faces ─────────────────────────────────────────── */
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("/assets/fonts/BricolageGrotesque-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Sora";
+  src: url("/assets/fonts/Sora-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+
+    /* Dark trading terminal palette */
+    --background:        0.10 0.005 240;
+    --foreground:        0.92 0.015 200;
+    --card:              0.14 0.008 240;
+    --card-foreground:   0.90 0.015 200;
+    --popover:           0.16 0.008 240;
+    --popover-foreground: 0.90 0.015 200;
+    --primary:           0.72 0.21 145;
+    --primary-foreground: 0.10 0.005 240;
+    --secondary:         0.18 0.010 240;
+    --secondary-foreground: 0.85 0.015 200;
+    --muted:             0.16 0.006 240;
+    --muted-foreground:  0.55 0.015 220;
+    --accent:            0.20 0.015 240;
+    --accent-foreground: 0.90 0.015 200;
+    --destructive:       0.62 0.23 25;
+    --destructive-foreground: 0.95 0.005 0;
+    --border:            0.22 0.012 240;
+    --input:             0.18 0.010 240;
+    --ring:              0.60 0.18 145;
+
+    /* Signal colors */
+    --signal-call:       0.72 0.21 145;
+    --signal-call-bg:    0.14 0.06 145;
+    --signal-put:        0.58 0.22 25;
+    --signal-put-bg:     0.14 0.06 25;
+    --signal-call-glow:  0.72 0.21 145 / 0.3;
+    --signal-put-glow:   0.58 0.22 25 / 0.3;
+
+    /* Payment badge colors */
+    --bkash-color:       0.65 0.20 355;
+    --nagad-color:       0.65 0.22 35;
+    --binance-color:     0.78 0.19 85;
+
+    --chart-1: 0.72 0.21 145;
+    --chart-2: 0.58 0.22 25;
+    --chart-3: 0.65 0.20 220;
+    --chart-4: 0.78 0.19 85;
+    --chart-5: 0.65 0.20 300;
+
+    --sidebar: 0.12 0.007 240;
+    --sidebar-foreground: 0.90 0.015 200;
+    --sidebar-primary: 0.72 0.21 145;
+    --sidebar-primary-foreground: 0.10 0.005 240;
+    --sidebar-accent: 0.18 0.010 240;
+    --sidebar-accent-foreground: 0.85 0.015 200;
+    --sidebar-border: 0.22 0.012 240;
+    --sidebar-ring: 0.60 0.18 145;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Sora", sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Bricolage Grotesque", sans-serif;
+  }
+
+  code, .mono {
+    font-family: "Geist Mono", monospace;
+  }
+}
+
+/* ─── Custom Utilities ───────────────────────────────────── */
+@layer utilities {
+  .signal-call {
+    background: oklch(var(--signal-call-bg));
+    border: 1px solid oklch(var(--signal-call) / 0.5);
+    box-shadow: 0 0 20px oklch(var(--signal-call-glow)), inset 0 1px 0 oklch(var(--signal-call) / 0.2);
+  }
+
+  .signal-put {
+    background: oklch(var(--signal-put-bg));
+    border: 1px solid oklch(var(--signal-put) / 0.5);
+    box-shadow: 0 0 20px oklch(var(--signal-put-glow)), inset 0 1px 0 oklch(var(--signal-put) / 0.2);
+  }
+
+  .text-call {
+    color: oklch(var(--signal-call));
+  }
+
+  .text-put {
+    color: oklch(var(--signal-put));
+  }
+
+  .glow-green {
+    box-shadow: 0 0 30px oklch(var(--signal-call) / 0.4);
+  }
+
+  .glow-red {
+    box-shadow: 0 0 30px oklch(var(--signal-put) / 0.4);
+  }
+
+  .terminal-border {
+    border: 1px solid oklch(var(--border));
+    background: linear-gradient(
+      135deg,
+      oklch(var(--card)) 0%,
+      oklch(0.12 0.008 250) 100%
+    );
+  }
+
+  .scanline {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0 0 0 / 0.03) 2px,
+      oklch(0 0 0 / 0.03) 4px
+    );
+  }
+
+  .grid-bg {
+    background-image:
+      linear-gradient(oklch(var(--border) / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(var(--border) / 0.5) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
