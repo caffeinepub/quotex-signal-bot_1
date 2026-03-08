@@ -31,54 +31,53 @@
   :root {
     --radius: 0.5rem;
 
-    /* Dark trading terminal palette */
-    --background:        0.10 0.005 240;
-    --foreground:        0.92 0.015 200;
-    --card:              0.14 0.008 240;
-    --card-foreground:   0.90 0.015 200;
-    --popover:           0.16 0.008 240;
-    --popover-foreground: 0.90 0.015 200;
-    --primary:           0.72 0.21 145;
-    --primary-foreground: 0.10 0.005 240;
-    --secondary:         0.18 0.010 240;
-    --secondary-foreground: 0.85 0.015 200;
-    --muted:             0.16 0.006 240;
-    --muted-foreground:  0.55 0.015 220;
-    --accent:            0.20 0.015 240;
-    --accent-foreground: 0.90 0.015 200;
+    /* BR MODS V2.0 — Gaming Cyan Dark Theme */
+    --background:        0.08 0.01 240;
+    --foreground:        0.92 0.015 195;
+    --card:              0.12 0.01 240;
+    --card-foreground:   0.90 0.015 195;
+    --popover:           0.14 0.01 240;
+    --popover-foreground: 0.90 0.015 195;
+    --primary:           0.78 0.18 195;
+    --primary-foreground: 0.08 0.01 240;
+    --secondary:         0.16 0.010 240;
+    --secondary-foreground: 0.85 0.015 195;
+    --muted:             0.14 0.006 240;
+    --muted-foreground:  0.52 0.015 220;
+    --accent:            0.18 0.015 240;
+    --accent-foreground: 0.90 0.015 195;
     --destructive:       0.62 0.23 25;
     --destructive-foreground: 0.95 0.005 0;
-    --border:            0.22 0.012 240;
-    --input:             0.18 0.010 240;
-    --ring:              0.60 0.18 145;
+    --border:            0.20 0.012 230;
+    --input:             0.16 0.010 240;
+    --ring:              0.65 0.18 195;
 
-    /* Signal colors */
-    --signal-call:       0.72 0.21 145;
-    --signal-call-bg:    0.14 0.06 145;
+    /* Signal/Panel colors — cyan theme */
+    --signal-call:       0.78 0.18 195;
+    --signal-call-bg:    0.12 0.07 195;
     --signal-put:        0.58 0.22 25;
     --signal-put-bg:     0.14 0.06 25;
-    --signal-call-glow:  0.72 0.21 145 / 0.3;
+    --signal-call-glow:  0.78 0.18 195 / 0.35;
     --signal-put-glow:   0.58 0.22 25 / 0.3;
 
     /* Payment badge colors */
     --bkash-color:       0.65 0.20 355;
     --nagad-color:       0.65 0.22 35;
-    --binance-color:     0.78 0.19 85;
 
-    --chart-1: 0.72 0.21 145;
+    --chart-1: 0.78 0.18 195;
     --chart-2: 0.58 0.22 25;
     --chart-3: 0.65 0.20 220;
     --chart-4: 0.78 0.19 85;
     --chart-5: 0.65 0.20 300;
 
-    --sidebar: 0.12 0.007 240;
-    --sidebar-foreground: 0.90 0.015 200;
-    --sidebar-primary: 0.72 0.21 145;
-    --sidebar-primary-foreground: 0.10 0.005 240;
-    --sidebar-accent: 0.18 0.010 240;
-    --sidebar-accent-foreground: 0.85 0.015 200;
-    --sidebar-border: 0.22 0.012 240;
-    --sidebar-ring: 0.60 0.18 145;
+    --sidebar: 0.10 0.007 240;
+    --sidebar-foreground: 0.90 0.015 195;
+    --sidebar-primary: 0.78 0.18 195;
+    --sidebar-primary-foreground: 0.08 0.01 240;
+    --sidebar-accent: 0.16 0.010 240;
+    --sidebar-accent-foreground: 0.85 0.015 195;
+    --sidebar-border: 0.20 0.012 230;
+    --sidebar-ring: 0.65 0.18 195;
   }
 
   * {
@@ -105,6 +104,7 @@
 
 /* ─── Custom Utilities ───────────────────────────────────── */
 @layer utilities {
+  /* Active panel feature card */
   .signal-call {
     background: oklch(var(--signal-call-bg));
     border: 1px solid oklch(var(--signal-call) / 0.5);
@@ -125,8 +125,13 @@
     color: oklch(var(--signal-put));
   }
 
+  /* Cyan glow effect */
   .glow-green {
-    box-shadow: 0 0 30px oklch(var(--signal-call) / 0.4);
+    box-shadow: 0 0 30px oklch(var(--signal-call) / 0.45);
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 30px oklch(var(--signal-call) / 0.45);
   }
 
   .glow-red {
@@ -138,8 +143,18 @@
     background: linear-gradient(
       135deg,
       oklch(var(--card)) 0%,
-      oklch(0.12 0.008 250) 100%
+      oklch(0.10 0.010 230) 100%
     );
+  }
+
+  .cyber-border {
+    border: 1px solid oklch(var(--signal-call) / 0.35);
+    background: linear-gradient(
+      135deg,
+      oklch(0.12 0.01 240) 0%,
+      oklch(0.10 0.015 215) 100%
+    );
+    box-shadow: 0 0 20px oklch(var(--signal-call) / 0.08), inset 0 1px 0 oklch(var(--signal-call) / 0.1);
   }
 
   .scanline {
@@ -154,8 +169,17 @@
 
   .grid-bg {
     background-image:
-      linear-gradient(oklch(var(--border) / 0.5) 1px, transparent 1px),
-      linear-gradient(90deg, oklch(var(--border) / 0.5) 1px, transparent 1px);
+      linear-gradient(oklch(var(--signal-call) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(var(--signal-call) / 0.05) 1px, transparent 1px);
     background-size: 40px 40px;
+  }
+
+  /* Animated neon text */
+  .neon-text {
+    color: oklch(var(--signal-call));
+    text-shadow:
+      0 0 10px oklch(var(--signal-call) / 0.8),
+      0 0 30px oklch(var(--signal-call) / 0.5),
+      0 0 60px oklch(var(--signal-call) / 0.3);
   }
 }

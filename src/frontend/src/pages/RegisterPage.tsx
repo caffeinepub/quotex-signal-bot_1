@@ -9,65 +9,29 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Check, CheckCircle, Copy, Crown, Loader2 } from "lucide-react";
+import {
+  Check,
+  CheckCircle,
+  Copy,
+  Crown,
+  Gamepad2,
+  Loader2,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { usePaymentInfo, useRegisterUser } from "../hooks/useQueries";
-
-const PACKAGES = [
-  {
-    months: 1,
-    days: 30,
-    label: "১ মাস",
-    price: 550,
-    originalPrice: 1100,
-    popular: false,
-  },
-  {
-    months: 2,
-    days: 60,
-    label: "২ মাস",
-    price: 1150,
-    originalPrice: 2300,
-    popular: false,
-  },
-  {
-    months: 3,
-    days: 90,
-    label: "৩ মাস",
-    price: 2100,
-    originalPrice: 4200,
-    popular: true,
-  },
-  {
-    months: 6,
-    days: 180,
-    label: "৬ মাস",
-    price: 4200,
-    originalPrice: 8400,
-    popular: false,
-  },
-  {
-    months: 12,
-    days: 365,
-    label: "১ বছর",
-    price: 8400,
-    originalPrice: 16800,
-    popular: false,
-  },
-];
+import { useRegisterUser } from "../hooks/useQueries";
+import { BR_PACKAGES } from "./HomePage";
 
 export default function RegisterPage() {
-  const { isLoading: paymentLoading } = usePaymentInfo();
   const { mutateAsync: registerUser, isPending } = useRegisterUser();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [ffUid, setFfUid] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [transactionId, setTransactionId] = useState("");
-  const [selectedPackageMonths, setSelectedPackageMonths] = useState<number>(1);
+  const [selectedPackageMonths, setSelectedPackageMonths] = useState<number>(3);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -77,6 +41,7 @@ export default function RegisterPage() {
     if (!phone.trim()) newErrors.phone = "ফোন নম্বর প্রয়োজন";
     else if (!/^01[3-9]\d{8}$/.test(phone.trim()))
       newErrors.phone = "সঠিক বাংলাদেশি ফোন নম্বর দিন";
+    if (!ffUid.trim()) newErrors.ffUid = "Free Fire UID প্রয়োজন";
     if (!paymentMethod) newErrors.paymentMethod = "পেমেন্ট পদ্ধতি নির্বাচন করুন";
     if (!transactionId.trim()) newErrors.transactionId = "ট্রানজেকশন ID প্রয়োজন";
     setErrors(newErrors);
@@ -88,14 +53,14 @@ export default function RegisterPage() {
     if (!validate()) return;
 
     try {
-      const selectedPkg = PACKAGES.find(
+      const selectedPkg = BR_PACKAGES.find(
         (p) => p.months === selectedPackageMonths,
       );
       const result = await registerUser({
         name: name.trim(),
         phone: phone.trim(),
         paymentMethod,
-        transactionId: `${transactionId.trim()}|pkg:${selectedPkg?.months}mo-${selectedPkg?.price}tk`,
+        transactionId: `${transactionId.trim()}|uid:${ffUid.trim()}|pkg:${selectedPkg?.months}mo-${selectedPkg?.price}tk`,
       });
       if (result) {
         setSuccess(true);
@@ -116,26 +81,25 @@ export default function RegisterPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
           className="text-center max-w-md"
+          data-ocid="register.success_state"
         >
-          <div className="w-20 h-20 rounded-full bg-signal-call-bg border border-signal-call/40 flex items-center justify-center mx-auto mb-6 glow-green">
+          <div className="w-20 h-20 rounded-full bg-signal-call-bg border border-signal-call/40 flex items-center justify-center mx-auto mb-6 glow-cyan">
             <CheckCircle className="w-10 h-10 text-call" />
           </div>
-          <h2 className="font-display text-3xl font-bold mb-3 text-call">
+          <h2 className="font-display text-3xl font-bold mb-3 neon-text">
             রেজিস্ট্রেশন সম্পন্ন!
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। অ্যাডমিন অ্যাপ্রুভালের জন্য অপেক্ষা করুন। অ্যাপ্রুভালের
-            পর আপনি সিগন্যাল দেখতে পাবেন।
+            পর আপনি BR MODS প্যানেল অ্যাক্সেস পাবেন।
           </p>
-          <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+          <div className="mt-6 p-4 bg-signal-call-bg/50 rounded-lg border border-signal-call/30">
             <p className="text-sm text-muted-foreground">
               আপনার ফোন নম্বর:{" "}
-              <span className="font-mono text-foreground font-semibold">
-                {phone}
-              </span>
+              <span className="font-mono text-call font-semibold">{phone}</span>
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              সিগন্যাল চেক করতে এই নম্বরটি ব্যবহার করুন
+              প্যানেল অ্যাক্সেস চেক করতে এই নম্বরটি ব্যবহার করুন
             </p>
           </div>
         </motion.div>
@@ -146,15 +110,19 @@ export default function RegisterPage() {
   return (
     <div className="py-10 px-4">
       <div className="container mx-auto max-w-5xl">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="mb-8 text-center"
         >
-          <h1 className="font-display text-3xl sm:text-4xl font-bold mb-2">
-            রেজিস্ট্রেশন করুন
-          </h1>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Gamepad2 className="w-6 h-6 text-call" />
+            <h1 className="font-display text-3xl sm:text-4xl font-bold">
+              প্রিমিয়াম প্যাকেজ কিনুন
+            </h1>
+          </div>
           <p className="text-muted-foreground text-sm">
             পেমেন্ট করার পর নিচের ফর্ম পূরণ করুন
           </p>
@@ -165,7 +133,7 @@ export default function RegisterPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.05 }}
-          className="mb-6 terminal-border rounded-2xl p-6"
+          className="mb-6 cyber-border rounded-2xl p-6"
         >
           <div className="flex items-center gap-2 mb-4">
             <Crown className="w-4 h-4 text-call" />
@@ -184,14 +152,14 @@ export default function RegisterPage() {
             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
             data-ocid="register.package.list"
           >
-            {PACKAGES.map((pkg) => (
+            {BR_PACKAGES.map((pkg) => (
               <button
                 key={pkg.months}
                 type="button"
                 onClick={() => setSelectedPackageMonths(pkg.months)}
                 className={`relative rounded-xl p-4 border-2 text-center transition-all cursor-pointer ${
                   selectedPackageMonths === pkg.months
-                    ? "border-signal-call bg-signal-call-bg glow-green"
+                    ? "border-signal-call bg-signal-call-bg glow-cyan"
                     : "border-border bg-card hover:border-signal-call/40"
                 }`}
                 data-ocid={`register.package.item.${pkg.months}`}
@@ -225,9 +193,15 @@ export default function RegisterPage() {
           <p className="text-xs text-muted-foreground mt-3 text-center">
             নির্বাচিত প্যাকেজ:{" "}
             <span className="text-call font-semibold">
-              {PACKAGES.find((p) => p.months === selectedPackageMonths)?.label}{" "}
+              {
+                BR_PACKAGES.find((p) => p.months === selectedPackageMonths)
+                  ?.label
+              }{" "}
               —{" "}
-              {PACKAGES.find((p) => p.months === selectedPackageMonths)?.price}{" "}
+              {
+                BR_PACKAGES.find((p) => p.months === selectedPackageMonths)
+                  ?.price
+              }{" "}
               টাকা
             </span>
           </p>
@@ -241,7 +215,7 @@ export default function RegisterPage() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:col-span-3"
           >
-            <div className="terminal-border rounded-2xl p-6 sm:p-8">
+            <div className="cyber-border rounded-2xl p-6 sm:p-8">
               <h2 className="font-display text-xl font-semibold mb-6">
                 ব্যক্তিগত তথ্য
               </h2>
@@ -277,10 +251,10 @@ export default function RegisterPage() {
                   </Label>
                   <Input
                     id="phone"
-                    placeholder="01XXXXXXXXX"
+                    placeholder="যে নম্বর থেকে টাকা পাঠাবেন সেই নম্বর দিন"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20 font-mono"
+                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20"
                     autoComplete="tel"
                     inputMode="numeric"
                     data-ocid="register.phone_input"
@@ -291,6 +265,30 @@ export default function RegisterPage() {
                       data-ocid="register.phone_error"
                     >
                       {errors.phone}
+                    </p>
+                  )}
+                </div>
+
+                {/* Free Fire UID */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="ffuid" className="text-sm font-medium">
+                    Free Fire UID <span className="text-put">*</span>
+                  </Label>
+                  <Input
+                    id="ffuid"
+                    placeholder="আপনার FF UID লিখুন (যেমন: 123456789)"
+                    value={ffUid}
+                    onChange={(e) => setFfUid(e.target.value)}
+                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20 font-mono"
+                    inputMode="numeric"
+                    data-ocid="register.ffuid_input"
+                  />
+                  {errors?.ffUid && (
+                    <p
+                      className="text-xs text-destructive"
+                      data-ocid="register.ffuid_error"
+                    >
+                      {errors.ffUid}
                     </p>
                   )}
                 </div>
@@ -316,7 +314,10 @@ export default function RegisterPage() {
                     </SelectContent>
                   </Select>
                   {errors?.paymentMethod && (
-                    <p className="text-xs text-destructive">
+                    <p
+                      className="text-xs text-destructive"
+                      data-ocid="register.payment_error"
+                    >
                       {errors.paymentMethod}
                     </p>
                   )}
@@ -348,7 +349,7 @@ export default function RegisterPage() {
                 <Button
                   type="submit"
                   disabled={isPending}
-                  className="w-full bg-signal-call hover:bg-signal-call/90 text-background font-bold glow-green border-0 mt-2"
+                  className="w-full bg-signal-call hover:bg-signal-call/90 text-background font-bold glow-cyan border-0 mt-2"
                   data-ocid="register.submit_button"
                 >
                   {isPending ? (
@@ -357,7 +358,7 @@ export default function RegisterPage() {
                       রেজিস্ট্রেশন হচ্ছে...
                     </>
                   ) : (
-                    `রেজিস্ট্রেশন করুন (${PACKAGES.find((p) => p.months === selectedPackageMonths)?.price} টাকা — ${PACKAGES.find((p) => p.months === selectedPackageMonths)?.label})`
+                    `রেজিস্ট্রেশন করুন (${BR_PACKAGES.find((p) => p.months === selectedPackageMonths)?.price} টাকা — ${BR_PACKAGES.find((p) => p.months === selectedPackageMonths)?.label})`
                   )}
                 </Button>
               </form>
@@ -371,36 +372,29 @@ export default function RegisterPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="lg:col-span-2 space-y-4"
           >
-            <div className="terminal-border rounded-2xl p-6">
+            <div className="cyber-border rounded-2xl p-6">
               <h3 className="font-display text-lg font-semibold mb-1">
                 পেমেন্ট নম্বর
               </h3>
               <p className="text-xs text-muted-foreground mb-4">
                 নিচের নম্বরে পেমেন্ট করুন এবং ট্রানজেকশন ID সংগ্রহ করুন
               </p>
-              {paymentLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-14 rounded-lg" />
-                  <Skeleton className="h-14 rounded-lg" />
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <CopyablePaymentRow
-                    label="Bkash"
-                    icon="💗"
-                    value="01305211080"
-                    color="#e91e8c"
-                    sendType="Personal Send"
-                  />
-                  <CopyablePaymentRow
-                    label="Nagad"
-                    icon="🟠"
-                    value="01305211080"
-                    color="#f97316"
-                    sendType="Personal Send"
-                  />
-                </div>
-              )}
+              <div className="space-y-3">
+                <CopyablePaymentRow
+                  label="Bkash"
+                  icon="💗"
+                  value="01305211080"
+                  color="#e91e8c"
+                  sendType="Personal Send"
+                />
+                <CopyablePaymentRow
+                  label="Nagad"
+                  icon="🟠"
+                  value="01305211080"
+                  color="#f97316"
+                  sendType="Personal Send"
+                />
+              </div>
 
               <div className="mt-4 p-3 rounded-lg border border-amber-500/30 bg-amber-500/10">
                 <p className="text-xs text-amber-400 font-semibold text-center">
@@ -412,11 +406,26 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div className="terminal-border rounded-xl p-4">
+            <div className="cyber-border rounded-xl p-4">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 ⚠️ পেমেন্টের পর রেজিস্ট্রেশন করুন। অ্যাডমিন যাচাই করার পর আপনার অ্যাকাউন্ট
-                সক্রিয় হবে।
+                সক্রিয় হবে এবং BR MODS প্যানেল অ্যাক্সেস পাবেন।
               </p>
+            </div>
+
+            {/* Panel preview image */}
+            <div className="cyber-border rounded-xl overflow-hidden">
+              <img
+                src="/assets/uploads/images-2.jpeg"
+                alt="BR MODS Panel Preview"
+                className="w-full object-cover aspect-video"
+                loading="lazy"
+              />
+              <div className="p-3 text-center">
+                <p className="text-xs text-call font-mono font-semibold">
+                  BR MODS V2.0 Panel Preview
+                </p>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -425,6 +434,7 @@ export default function RegisterPage() {
   );
 }
 
+// ─── Copyable Payment Row ──────────────────────────────────────────────────────
 function CopyablePaymentRow({
   label,
   icon,
@@ -463,6 +473,7 @@ function CopyablePaymentRow({
           className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
           title="কপি করুন"
           type="button"
+          data-ocid="register.copy_button"
         >
           {copied ? (
             <Check className="w-3.5 h-3.5 text-call" />

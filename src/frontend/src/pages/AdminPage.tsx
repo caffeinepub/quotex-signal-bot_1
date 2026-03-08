@@ -29,15 +29,29 @@ export default function AdminPage() {
         transition={{ duration: 0.5 }}
         className="w-full max-w-md"
       >
-        <div className="terminal-border rounded-2xl p-8 text-center">
-          {/* Icon */}
-          <div className="w-20 h-20 rounded-full bg-signal-call-bg border border-signal-call/30 flex items-center justify-center mx-auto mb-6">
-            <Shield className="w-10 h-10 text-call" />
+        <div className="cyber-border rounded-2xl p-8 text-center">
+          {/* BR MODS Logo */}
+          <div className="flex justify-center mb-4">
+            <div className="relative">
+              <div className="absolute inset-0 blur-xl bg-signal-call/20 rounded-full scale-150" />
+              <img
+                src="/assets/uploads/Screenshot-2025-12-05-042219-3.png"
+                alt="BR MODS"
+                className="relative h-16 w-auto object-contain"
+              />
+            </div>
           </div>
 
-          <h1 className="font-display text-3xl font-bold mb-2">অ্যাডমিন প্যানেল</h1>
+          {/* Icon */}
+          <div className="w-16 h-16 rounded-full bg-signal-call-bg border border-signal-call/30 flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-call" />
+          </div>
+
+          <h1 className="font-display text-3xl font-bold mb-1 neon-text">
+            অ্যাডমিন প্যানেল
+          </h1>
           <p className="text-muted-foreground text-sm mb-8">
-            প্রবেশ করতে আপনার পরিচয় যাচাই করুন
+            BR MODS V2.0 — প্রবেশ করতে আপনার পরিচয় যাচাই করুন
           </p>
 
           {isLoading && (
@@ -64,7 +78,7 @@ export default function AdminPage() {
             <Button
               onClick={login}
               disabled={isLoggingIn}
-              className="w-full bg-signal-call hover:bg-signal-call/90 text-background font-semibold glow-green border-0"
+              className="w-full bg-signal-call hover:bg-signal-call/90 text-background font-semibold glow-cyan border-0"
               data-ocid="admin.login_button"
             >
               {isLoggingIn ? (
@@ -91,7 +105,7 @@ export default function AdminPage() {
             </div>
           )}
 
-          <div className="mt-6 p-3 bg-muted/30 rounded-lg border border-border">
+          <div className="mt-6 p-3 bg-muted/30 rounded-lg border border-signal-call/20">
             <p className="text-xs text-muted-foreground">
               🔒 Internet Identity ব্যবহার করে নিরাপদভাবে লগইন করুন
             </p>

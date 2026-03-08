@@ -1,70 +1,60 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CheckCircle,
-  Clock,
   Crown,
-  Shield,
-  TrendingDown,
-  TrendingUp,
+  ShieldCheck,
+  Swords,
+  Target,
   Wallet,
   Zap,
 } from "lucide-react";
 import { type Variants, motion } from "motion/react";
 import { useState } from "react";
-import { usePaymentInfo } from "../hooks/useQueries";
 
-const PACKAGES = [
-  {
-    months: 1,
-    days: 30,
-    label: "১ মাস",
-    price: 550,
-    originalPrice: 1100,
-    popular: false,
-  },
-  {
-    months: 2,
-    days: 60,
-    label: "২ মাস",
-    price: 1150,
-    originalPrice: 2300,
-    popular: false,
-  },
-  {
-    months: 3,
-    days: 90,
-    label: "৩ মাস",
-    price: 2100,
-    originalPrice: 4200,
-    popular: true,
-  },
+// ─── BR MODS Packages (hardcoded) ─────────────────────────────────────────────
+export const BR_PACKAGES = [
+  { months: 1, label: "১ মাস", price: 250, originalPrice: 500, popular: false },
+  { months: 2, label: "২ মাস", price: 400, originalPrice: 800, popular: false },
+  { months: 3, label: "৩ মাস", price: 600, originalPrice: 1200, popular: true },
   {
     months: 6,
-    days: 180,
     label: "৬ মাস",
-    price: 4200,
-    originalPrice: 8400,
+    price: 1000,
+    originalPrice: 2000,
     popular: false,
   },
   {
     months: 12,
-    days: 365,
     label: "১ বছর",
-    price: 8400,
-    originalPrice: 16800,
+    price: 1600,
+    originalPrice: 3200,
     popular: false,
   },
 ];
 
+// ─── Panel Features ────────────────────────────────────────────────────────────
+const PANEL_FEATURES = [
+  { name: "TELEKILL", icon: "🎯", desc: "দূর থেকে কিল করুন" },
+  { name: "UP PLAYER", icon: "⬆️", desc: "প্লেয়ার পজিশন আপ" },
+  { name: "Esp Players", icon: "👁️", desc: "দেওয়ালের আড়াল দেখুন" },
+  { name: "SHOW LINE", icon: "📐", desc: "টার্গেট লাইন দেখুন" },
+  { name: "SHOW BOX", icon: "📦", desc: "প্লেয়ার বক্স দেখুন" },
+  { name: "Memory Hack", icon: "💾", desc: "মেমোরি অ্যাক্সেস" },
+  { name: "Silent Aim", icon: "🔇", desc: "অটো টার্গেট লক" },
+  { name: "Head (Black List)", icon: "🎮", desc: "হেড শট মোড" },
+  { name: "Speed Hack", icon: "⚡", desc: "স্পিড বুস্ট" },
+  { name: "Angle Fov", icon: "🔭", desc: "ফিল্ড অফ ভিউ এক্সপ্যান্ড" },
+];
+
+// ─── Animation Variants ───────────────────────────────────────────────────────
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.12 },
+    transition: { staggerChildren: 0.1 },
   },
 };
 const itemVariants: Variants = {
@@ -73,125 +63,79 @@ const itemVariants: Variants = {
 };
 
 export default function HomePage() {
-  const { isLoading } = usePaymentInfo();
-  const [selectedPackage, setSelectedPackage] = useState<number>(1); // months
+  const [selectedPackage, setSelectedPackage] = useState<number>(3); // months
 
   return (
     <div className="relative overflow-hidden">
-      {/* Background grid */}
-      <div className="fixed inset-0 grid-bg opacity-30 pointer-events-none" />
-
-      {/* Hero Section */}
+      {/* ─── Hero Section ─────────────────────────────────────────────────── */}
       <section className="relative pt-10 pb-16 px-4">
         <div className="container mx-auto max-w-5xl">
-          {/* Chat Preview Image */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex justify-center mb-8"
-          >
-            <div className="relative w-full max-w-lg rounded-2xl overflow-hidden border border-signal-call/30 shadow-2xl shadow-signal-call/10">
-              <img
-                src="/assets/generated/chat-preview.dim_600x400.png"
-                alt="Trading Signal Chat Preview"
-                className="w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-0 right-0 text-center">
-                <Badge
-                  variant="outline"
-                  className="gap-2 px-4 py-1.5 border-signal-call/50 text-call bg-background/90 font-mono text-xs backdrop-blur-sm"
-                >
-                  <span className="w-2 h-2 rounded-full bg-signal-call animate-pulse" />
-                  LIVE VIP SIGNALS — এখনই যোগ দিন
-                </Badge>
-              </div>
-            </div>
-          </motion.div>
-
+          {/* BR MODS Logo + Title */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="text-center"
+            className="text-center mb-10"
           >
-            {/* Title */}
+            <motion.div
+              variants={itemVariants}
+              className="flex justify-center mb-6"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 blur-2xl bg-signal-call/20 rounded-full scale-150" />
+                <img
+                  src="/assets/uploads/Screenshot-2025-12-05-042219-1-6.png"
+                  alt="BR MODS Logo"
+                  className="relative h-24 w-auto object-contain drop-shadow-[0_0_20px_oklch(0.78_0.18_195/0.8)]"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants}>
+              <Badge
+                variant="outline"
+                className="gap-2 px-4 py-1.5 border-signal-call/50 text-call bg-signal-call-bg font-mono text-xs mb-4"
+              >
+                <span className="w-2 h-2 rounded-full bg-signal-call animate-pulse" />
+                PREMIUM PANEL ACCESS
+              </Badge>
+            </motion.div>
+
             <motion.h1
               variants={itemVariants}
-              className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-4"
+              className="font-display text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-4"
             >
-              <span className="text-foreground">Quotex</span>{" "}
-              <span className="text-call">Signal Bot</span>
+              <span className="neon-text">BR MODS</span>{" "}
+              <span className="text-foreground font-mono text-3xl sm:text-4xl md:text-5xl align-middle opacity-70">
+                V2.0
+              </span>
             </motion.h1>
 
             <motion.p
               variants={itemVariants}
-              className="text-lg sm:text-xl text-muted-foreground mb-3 font-body max-w-xl mx-auto"
+              className="text-lg sm:text-xl text-muted-foreground mb-8 font-body max-w-xl mx-auto"
             >
-              পেশাদার ট্রেডিং সিগন্যাল — সরাসরি আপনার হাতে
+              Free Fire-এর সেরা মড প্যানেল — এখনই অ্যাক্সেস নিন
             </motion.p>
 
-            {/* Premium CTA Banner */}
-            <motion.div
-              variants={itemVariants}
-              className="mx-auto max-w-2xl mb-8"
-            >
-              <div className="relative rounded-2xl overflow-hidden border border-signal-call/40 bg-gradient-to-r from-signal-call-bg via-signal-call-bg/50 to-signal-call-bg p-6">
-                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-signal-call/60 to-transparent" />
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <Crown className="w-5 h-5 text-call" />
-                  <span className="font-display text-lg font-bold text-call">
-                    প্রিমিয়াম সিগন্যাল নিতে চান?
-                  </span>
-                  <Crown className="w-5 h-5 text-call" />
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  এখনই প্রিমিয়াম প্যাকেজ ক্রয় করুন এবং উচ্চ নির্ভুলতার লাইভ ট্রেডিং সিগন্যাল
-                  পান
-                </p>
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-signal-call hover:bg-signal-call/90 text-background font-bold px-10 glow-green border-0 text-base"
-                  data-ocid="home.premium_button"
-                >
-                  <Link to="/register">
-                    এখনই প্রিমিয়াম প্যাকেজ ক্রয় করুন
-                    <ArrowRight className="ml-2 w-5 h-5" />
-                  </Link>
-                </Button>
-              </div>
-            </motion.div>
-
-            {/* Stats */}
-            <motion.div
-              variants={itemVariants}
-              className="mt-4 grid grid-cols-3 gap-4 max-w-sm mx-auto"
-            >
-              {[
-                { value: "85-94%", label: "নির্ভুলতা" },
-                { value: "24/7", label: "সক্রিয়" },
-                { value: "Live", label: "রিয়েল-টাইম" },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="text-center terminal-border rounded-lg p-3"
-                >
-                  <div className="font-mono text-lg font-bold text-call">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+            <motion.div variants={itemVariants}>
+              <Button
+                asChild
+                size="lg"
+                className="bg-signal-call hover:bg-signal-call/90 text-background font-bold px-10 glow-cyan border-0 text-base"
+                data-ocid="home.primary_button"
+              >
+                <Link to="/register">
+                  এখনই প্যাকেজ কিনুন
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+              </Button>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Package Selection Section */}
+      {/* ─── 50% OFF Banner + Package Selection ─────────────────────────────── */}
       <section className="py-10 px-4">
         <div className="container mx-auto max-w-3xl">
           {/* 50% Offer Banner */}
@@ -203,9 +147,7 @@ export default function HomePage() {
             className="mb-7"
           >
             <div className="relative rounded-2xl overflow-hidden border border-orange-500/50 bg-gradient-to-r from-red-950/80 via-orange-950/80 to-red-950/80 p-5 text-center shadow-lg shadow-orange-900/30">
-              {/* Animated glow border */}
               <div className="absolute inset-0 rounded-2xl animate-pulse bg-gradient-to-r from-red-500/10 via-orange-400/15 to-red-500/10 pointer-events-none" />
-              {/* Top shimmer line */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-400/80 to-transparent" />
               <div className="relative">
                 <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/40 rounded-full px-4 py-1 mb-3">
@@ -223,32 +165,30 @@ export default function HomePage() {
                 <p className="text-orange-300/80 text-sm mt-2">
                   এখনই অর্ডার করুন — অফার যেকোনো সময় শেষ হতে পারে
                 </p>
-                <div className="flex items-center justify-center gap-3 mt-3">
-                  {[
-                    "⏰ সীমিত অফার",
-                    "💯 গ্যারান্টিড সিগন্যাল",
-                    "🚀 তাৎক্ষণিক অ্যাক্সেস",
-                  ].map((tag) => (
-                    <span
-                      key={tag}
-                      className="text-[10px] text-orange-300/70 font-semibold"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                <div className="flex items-center justify-center gap-3 mt-3 flex-wrap">
+                  {["⏰ সীমিত অফার", "🎮 তাৎক্ষণিক অ্যাক্সেস", "🔒 নিরাপদ পেমেন্ট"].map(
+                    (tag) => (
+                      <span
+                        key={tag}
+                        className="text-[10px] text-orange-300/70 font-semibold"
+                      >
+                        {tag}
+                      </span>
+                    ),
+                  )}
                 </div>
               </div>
-              {/* Bottom shimmer line */}
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-orange-400/60 to-transparent" />
             </div>
           </motion.div>
 
+          {/* Package title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="text-center mb-8"
+            className="text-center mb-6"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <Crown className="w-5 h-5 text-call" />
@@ -262,11 +202,12 @@ export default function HomePage() {
             </p>
           </motion.div>
 
+          {/* Package Cards */}
           <div
             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6"
             data-ocid="home.package.list"
           >
-            {PACKAGES.map((pkg) => (
+            {BR_PACKAGES.map((pkg) => (
               <motion.button
                 key={pkg.months}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -276,7 +217,7 @@ export default function HomePage() {
                 onClick={() => setSelectedPackage(pkg.months)}
                 className={`relative rounded-xl p-4 border-2 text-center transition-all cursor-pointer ${
                   selectedPackage === pkg.months
-                    ? "border-signal-call bg-signal-call-bg glow-green"
+                    ? "border-signal-call bg-signal-call-bg glow-cyan"
                     : "border-border bg-card hover:border-signal-call/40"
                 }`}
                 data-ocid={`home.package.item.${pkg.months}`}
@@ -316,6 +257,7 @@ export default function HomePage() {
             ))}
           </div>
 
+          {/* CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -325,13 +267,14 @@ export default function HomePage() {
             <Button
               asChild
               size="lg"
-              className="bg-signal-call hover:bg-signal-call/90 text-background font-bold px-10 glow-green border-0"
+              className="bg-signal-call hover:bg-signal-call/90 text-background font-bold px-10 glow-cyan border-0"
               data-ocid="home.register_button"
             >
               <Link to="/register">
-                {PACKAGES.find((p) => p.months === selectedPackage)?.price} টাকায়{" "}
-                {PACKAGES.find((p) => p.months === selectedPackage)?.label}ের
-                প্যাকেজ কিনুন
+                এখনই কিনুন —{" "}
+                {BR_PACKAGES.find((p) => p.months === selectedPackage)?.price}{" "}
+                টাকা (
+                {BR_PACKAGES.find((p) => p.months === selectedPackage)?.label})
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Link>
             </Button>
@@ -339,150 +282,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Sample signal cards */}
-      <section className="py-10 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
-          >
-            <h2 className="font-display text-2xl font-bold mb-2">
-              সিগন্যাল কেমন দেখায়?
-            </h2>
-            <p className="text-muted-foreground text-sm">নমুনা সিগন্যাল কার্ড</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto">
-            {/* CALL sample */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="signal-call rounded-xl p-5"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-xs text-muted-foreground font-mono mb-1">
-                    ASSET
-                  </p>
-                  <p className="font-display text-xl font-bold text-call">
-                    USD/PKR OTC
-                  </p>
-                </div>
-                <div className="text-3xl">⬆️</div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge className="bg-signal-call/20 text-call border-signal-call/40 font-mono text-sm">
-                  CALL
-                </Badge>
-                <span className="text-sm font-mono text-call">91% নির্ভুল</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3 font-mono">
-                ⏱ ৫ মিনিট • পরবর্তী ক্যান্ডেলে প্রবেশ করুন
-              </p>
-            </motion.div>
-
-            {/* PUT sample */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="signal-put rounded-xl p-5"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-xs text-muted-foreground font-mono mb-1">
-                    ASSET
-                  </p>
-                  <p className="font-display text-xl font-bold text-put">
-                    EUR/USD OTC
-                  </p>
-                </div>
-                <div className="text-3xl">⬇️</div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Badge className="bg-signal-put/20 text-put border-signal-put/40 font-mono text-sm">
-                  PUT
-                </Badge>
-                <span className="text-sm font-mono text-put">88% নির্ভুল</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-3 font-mono">
-                ⏱ ৩ মিনিট • পরবর্তী ক্যান্ডেলে প্রবেশ করুন
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="py-14 px-4">
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-10"
-          >
-            <h2 className="font-display text-2xl font-bold mb-2">
-              কিভাবে ব্যবহার করবেন?
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                step: "০১",
-                icon: Wallet,
-                title: "পেমেন্ট করুন",
-                desc: "Bkash, Nagad বা Binance-এর মাধ্যমে পেমেন্ট করুন",
-                color: "text-call",
-              },
-              {
-                step: "০২",
-                icon: CheckCircle,
-                title: "রেজিস্ট্রেশন করুন",
-                desc: "আপনার নাম, ফোন ও ট্রানজেকশন ID দিয়ে রেজিস্ট্রেশন করুন",
-                color: "text-call",
-              },
-              {
-                step: "০৩",
-                icon: TrendingUp,
-                title: "সিগন্যাল পান",
-                desc: "অ্যাডমিন অ্যাপ্রুভালের পর লাইভ সিগন্যাল দেখুন",
-                color: "text-call",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="terminal-border rounded-xl p-6 relative"
-              >
-                <div className="font-mono text-4xl font-bold text-border mb-4 leading-none">
-                  {item.step}
-                </div>
-                <item.icon className={`w-6 h-6 ${item.color} mb-3`} />
-                <h3 className="font-display text-lg font-semibold mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {item.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Payment Info Section */}
+      {/* ─── Payment Section ────────────────────────────────────────────────── */}
       <section className="py-14 px-4">
         <div className="container mx-auto max-w-2xl">
           <motion.div
@@ -490,7 +290,7 @@ export default function HomePage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="terminal-border rounded-2xl p-8"
+            className="cyber-border rounded-2xl p-8"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <Crown className="w-5 h-5 text-call" />
@@ -499,38 +299,31 @@ export default function HomePage() {
               </h2>
               <Crown className="w-5 h-5 text-call" />
             </div>
-            <p className="text-sm text-muted-foreground text-center mb-2">
+            <p className="text-sm font-semibold text-call text-center mb-1">
               সিগন্যাল নিতে এখনই প্রিমিয়াম প্যাকেজ ক্রয় করুন
             </p>
             <p className="text-xs text-muted-foreground text-center mb-8">
-              Bkash অথবা Nagad-এ পেমেন্ট করুন
+              Bkash অথবা Nagad-এ Personal Send করুন
             </p>
 
-            {isLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-24 rounded-lg" />
-                <Skeleton className="h-24 rounded-lg" />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <PaymentMethodCard
-                  method="Bkash"
-                  icon="💗"
-                  number="01305211080"
-                  sendType="Personal Send"
-                  color="oklch(0.65 0.20 355)"
-                  bgColor="oklch(0.14 0.06 355)"
-                />
-                <PaymentMethodCard
-                  method="Nagad"
-                  icon="🟠"
-                  number="01305211080"
-                  sendType="Personal Send"
-                  color="oklch(0.65 0.22 35)"
-                  bgColor="oklch(0.14 0.06 35)"
-                />
-              </div>
-            )}
+            <div className="space-y-4">
+              <PaymentMethodCard
+                method="Bkash"
+                icon="💗"
+                number="01305211080"
+                sendType="Personal Send"
+                color="oklch(0.65 0.20 355)"
+                bgColor="oklch(0.14 0.06 355)"
+              />
+              <PaymentMethodCard
+                method="Nagad"
+                icon="🟠"
+                number="01305211080"
+                sendType="Personal Send"
+                color="oklch(0.65 0.22 35)"
+                bgColor="oklch(0.14 0.06 35)"
+              />
+            </div>
 
             <div className="mt-5 p-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-center">
               <p className="text-xs text-amber-400 font-semibold">
@@ -542,7 +335,7 @@ export default function HomePage() {
               <Button
                 asChild
                 size="lg"
-                className="bg-signal-call hover:bg-signal-call/90 text-background font-bold glow-green border-0 px-8"
+                className="bg-signal-call hover:bg-signal-call/90 text-background font-bold glow-cyan border-0 px-8"
                 data-ocid="home.payment_register_button"
               >
                 <Link to="/register">
@@ -555,25 +348,294 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* ─── Screenshots Grid ────────────────────────────────────────────────── */}
+      <section className="py-10 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="max-w-2xl mx-auto mb-10 space-y-3"
+          >
+            {/* Row 1: Free Fire banner - full width */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="relative rounded-xl overflow-hidden border border-signal-call/30 shadow-lg shadow-signal-call/10 group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent z-10" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-2 border-signal-call/60 rounded-xl z-20 pointer-events-none" />
+              <img
+                src="/assets/uploads/images-2--2.jpeg"
+                alt="Free Fire"
+                className="w-full h-40 object-cover object-center"
+                loading="lazy"
+              />
+              <div className="absolute bottom-2 left-2 right-2 z-20">
+                <span className="text-[10px] font-mono text-call/90 bg-background/80 px-2 py-0.5 rounded">
+                  Free Fire — 50 Players | 10 Minutes | 1 Survivor
+                </span>
+              </div>
+            </motion.div>
+
+            {/* Row 2: 2 cols - Login + Panel */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  src: "/assets/uploads/images-1-1.png",
+                  alt: "BR MODS External Login",
+                  label: "Login Screen",
+                },
+                {
+                  src: "/assets/uploads/images-1-5.jpeg",
+                  alt: "BR MODS Panel Features",
+                  label: "Panel Controls",
+                },
+              ].map((img, i) => (
+                <motion.div
+                  key={img.alt}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.2 + i * 0.1 }}
+                  className="relative rounded-xl overflow-hidden border border-signal-call/30 shadow-lg shadow-signal-call/10 group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-2 border-signal-call/60 rounded-xl z-20 pointer-events-none" />
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full aspect-[4/5] object-cover object-center"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-2 left-2 right-2 z-20">
+                    <span className="text-[10px] font-mono text-call/90 bg-background/80 px-2 py-0.5 rounded">
+                      {img.label}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Row 3: 2 cols - Free Fire Max + Gameplay */}
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                {
+                  src: "/assets/uploads/images-3--4.jpeg",
+                  alt: "Free Fire Max",
+                  label: "Free Fire MAX",
+                },
+                {
+                  src: "/assets/uploads/Screenshot_2026-03-08-20-25-27-380-edit_com.google.android.youtube-1-7.jpg",
+                  alt: "BR MODS Gameplay",
+                  label: "Live Gameplay",
+                },
+              ].map((img, i) => (
+                <motion.div
+                  key={img.alt}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.3 + i * 0.1 }}
+                  className="relative rounded-xl overflow-hidden border border-signal-call/30 shadow-lg shadow-signal-call/10 group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent z-10" />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-2 border-signal-call/60 rounded-xl z-20 pointer-events-none" />
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    className="w-full aspect-video object-cover object-center"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-2 left-2 right-2 z-20">
+                    <span className="text-[10px] font-mono text-call/90 bg-background/80 px-2 py-0.5 rounded">
+                      {img.label}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Row 4: Free Fire character - full width */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="relative rounded-xl overflow-hidden border border-signal-call/30 shadow-lg shadow-signal-call/10 group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-transparent z-10" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 border-2 border-signal-call/60 rounded-xl z-20 pointer-events-none" />
+              <img
+                src="/assets/uploads/images-1--3.jpeg"
+                alt="Free Fire Character"
+                className="w-full h-36 object-cover object-top"
+                loading="lazy"
+              />
+              <div className="absolute bottom-2 left-2 right-2 z-20">
+                <span className="text-[10px] font-mono text-call/90 bg-background/80 px-2 py-0.5 rounded">
+                  Free Fire — Premium Access
+                </span>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="grid grid-cols-3 gap-4 max-w-sm mx-auto"
+          >
+            {[
+              { value: "10+", label: "ফিচার" },
+              { value: "24/7", label: "সক্রিয়" },
+              { value: "ফ্রি ফায়ার", label: "গেম" },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                className="text-center cyber-border rounded-lg p-3"
+              >
+                <div className="font-mono text-lg font-bold text-call">
+                  {stat.value}
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─── Panel Features Grid ─────────────────────────────────────────────── */}
       <section className="py-14 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
+          >
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Swords className="w-5 h-5 text-call" />
+              <h2 className="font-display text-2xl sm:text-3xl font-bold">
+                প্যানেল ফিচার সমূহ
+              </h2>
+              <Swords className="w-5 h-5 text-call" />
+            </div>
+            <p className="text-muted-foreground text-sm">
+              BR MODS V2.0 প্যানেলে যা যা পাচ্ছেন
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            {PANEL_FEATURES.map((feature, i) => (
+              <motion.div
+                key={feature.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="cyber-border rounded-xl p-4 text-center group hover:border-signal-call/60 transition-all hover:shadow-[0_0_20px_oklch(0.78_0.18_195/0.2)]"
+              >
+                <div className="text-2xl mb-2">{feature.icon}</div>
+                <p className="font-mono text-xs font-bold text-call mb-1">
+                  {feature.name}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  {feature.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── How it works ──────────────────────────────────────────────────── */}
+      <section className="py-14 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
+          >
+            <h2 className="font-display text-2xl font-bold mb-2">
+              কিভাবে কাজ করে?
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                step: "০১",
+                icon: Wallet,
+                title: "পেমেন্ট করুন",
+                desc: "Bkash বা Nagad-এ 01305211080 নম্বরে Personal Send করুন",
+              },
+              {
+                step: "০২",
+                icon: CheckCircle,
+                title: "রেজিস্ট্রেশন করুন",
+                desc: "আপনার নাম, ফোন, Free Fire UID ও ট্রানজেকশন ID দিয়ে রেজিস্ট্রেশন করুন",
+              },
+              {
+                step: "০৩",
+                icon: Target,
+                title: "প্যানেল অ্যাক্সেস পান",
+                desc: "অ্যাডমিন অ্যাপ্রুভালের পর সম্পূর্ণ BR MODS প্যানেল অ্যাক্সেস পাবেন",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.12 }}
+                className="cyber-border rounded-xl p-6 relative"
+              >
+                <div className="font-mono text-4xl font-bold text-border mb-4 leading-none">
+                  {item.step}
+                </div>
+                <item.icon className="w-6 h-6 text-call mb-3" />
+                <h3 className="font-display text-lg font-semibold mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── App Features ──────────────────────────────────────────────────── */}
+      <section className="py-14 px-4 bg-card/20">
         <div className="container mx-auto max-w-4xl">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               {
                 icon: Zap,
-                title: "রিয়েল-টাইম সিগন্যাল",
-                desc: "লাইভ মার্কেট ডেটার উপর ভিত্তি করে তাৎক্ষণিক সিগন্যাল",
+                title: "তাৎক্ষণিক অ্যাক্সেস",
+                desc: "পেমেন্ট ও রেজিস্ট্রেশনের পর অ্যাডমিন অ্যাপ্রুভাল হলেই সক্রিয়",
               },
               {
-                icon: Shield,
-                title: "নিরাপদ অ্যাক্সেস",
-                desc: "পেমেন্ট যাচাইয়ের পর শুধুমাত্র অ্যাক্টিভ ব্যবহারকারীরা সিগন্যাল দেখতে পারবে",
+                icon: ShieldCheck,
+                title: "নিরাপদ প্যানেল",
+                desc: "শুধুমাত্র যাচাইকৃত ব্যবহারকারীরা BR MODS প্যানেল অ্যাক্সেস পাবেন",
               },
               {
-                icon: Clock,
-                title: "২৪/৭ সক্রিয়",
-                desc: "দিনরাত যেকোনো সময় সিগন্যাল চেক করুন",
+                icon: Target,
+                title: "১০+ ফিচার",
+                desc: "TELEKILL, Silent Aim, ESP, Speed Hack সহ সকল প্রিমিয়াম ফিচার",
               },
             ].map((feature, i) => (
               <motion.div
@@ -582,7 +644,7 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="terminal-border rounded-xl p-5"
+                className="cyber-border rounded-xl p-5"
               >
                 <div className="w-10 h-10 rounded-lg bg-signal-call-bg border border-signal-call/30 flex items-center justify-center mb-4">
                   <feature.icon className="w-5 h-5 text-call" />
@@ -596,204 +658,11 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Quotex Trading Guide */}
-      <section className="py-14 px-4 bg-card/30">
-        <div className="container mx-auto max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-10"
-          >
-            <Badge
-              variant="outline"
-              className="gap-2 px-4 py-1.5 border-signal-call/40 text-call bg-signal-call-bg font-mono text-xs mb-4"
-            >
-              <TrendingUp className="w-3 h-3" />
-              Quotex ট্রেডিং গাইড
-            </Badge>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">
-              Quotex কী এবং কীভাবে ট্রেড করবেন?
-            </h2>
-            <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
-              Quotex একটি আন্তর্জাতিক ডিজিটাল অপশন ট্রেডিং প্ল্যাটফর্ম। সঠিক সিগন্যাল ব্যবহার
-              করে আপনি নির্ভরযোগ্যভাবে আয় করতে পারবেন।
-            </p>
-          </motion.div>
-
-          {/* What is Quotex */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="terminal-border rounded-2xl p-6 sm:p-8 mb-6"
-          >
-            <h3 className="font-display text-xl font-bold mb-4 text-call flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Quotex কী?
-            </h3>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-              Quotex (quotex.io) হলো একটি জনপ্রিয় অনলাইন বাইনারি/ডিজিটাল অপশন ট্রেডিং
-              প্ল্যাটফর্ম। এখানে আপনি ফরেক্স (USD/EUR), ক্রিপ্টো (BTC/ETH), কমোডিটি
-              (Gold, Oil) এবং OTC পেয়ারে ট্রেড করতে পারবেন। ট্রেডার নির্দিষ্ট সময়ের
-              মধ্যে মূল্য বাড়বে (CALL) নাকি কমবে (PUT) তা পূর্বাভাস দেয়। সঠিক পূর্বাভাস হলে
-              বিনিয়োগের উপর ৮০-৯৫% পর্যন্ত মুনাফা পাওয়া যায়।
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: "মিনিমাম ডিপোজিট", value: "$10" },
-                { label: "মিনিমাম ট্রেড", value: "$1" },
-                { label: "সর্বোচ্চ রিটার্ন", value: "95%" },
-                { label: "উইথড্র সময়", value: "১-৩ দিন" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="bg-muted/40 rounded-lg p-3 text-center border border-border"
-                >
-                  <div className="font-mono font-bold text-call text-lg">
-                    {item.value}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {item.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* How to trade */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="terminal-border rounded-2xl p-6"
-            >
-              <h3 className="font-display text-lg font-bold mb-4 text-call">
-                📊 CALL (UP) ট্রেড কখন করবেন?
-              </h3>
-              <ul className="space-y-2.5 text-sm text-muted-foreground">
-                {[
-                  "সিগন্যাল বট CALL ⬆️ দেখালে",
-                  "মার্কেট আপট্রেন্ডে আছে বলে মনে হলে",
-                  "সাপোর্ট লেভেল থেকে বাউন্স করলে",
-                  "বুলিশ ক্যান্ডেলস্টিক প্যাটার্ন দেখলে",
-                  "RSI ৩০-এর নিচে থেকে উঠে আসলে",
-                ].map((tip) => (
-                  <li key={tip} className="flex items-start gap-2">
-                    <span className="text-call mt-0.5">✅</span>
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="terminal-border rounded-2xl p-6"
-            >
-              <h3 className="font-display text-lg font-bold mb-4 text-put">
-                📉 PUT (DOWN) ট্রেড কখন করবেন?
-              </h3>
-              <ul className="space-y-2.5 text-sm text-muted-foreground">
-                {[
-                  "সিগন্যাল বট PUT ⬇️ দেখালে",
-                  "মার্কেট ডাউনট্রেন্ডে আছে বলে মনে হলে",
-                  "রেজিস্ট্যান্স লেভেলে রিজেক্ট হলে",
-                  "বেয়ারিশ ক্যান্ডেলস্টিক প্যাটার্ন দেখলে",
-                  "RSI ৭০-এর উপরে থেকে নামতে শুরু করলে",
-                ].map((tip) => (
-                  <li key={tip} className="flex items-start gap-2">
-                    <span className="text-put mt-0.5">🔴</span>
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          </div>
-
-          {/* Trading Tips */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="terminal-border rounded-2xl p-6 sm:p-8 mb-6"
-          >
-            <h3 className="font-display text-xl font-bold mb-5 text-call flex items-center gap-2">
-              <Zap className="w-5 h-5" />
-              সফল ট্রেডিং টিপস
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {[
-                {
-                  num: "০১",
-                  title: "সিগন্যাল আসার সাথে সাথে ট্রেড করুন",
-                  desc: "সিগন্যাল পাওয়ার পর পরবর্তী ক্যান্ডেল শুরু হলে ট্রেড এন্টার করুন। দেরি করলে নির্ভুলতা কমে যায়।",
-                },
-                {
-                  num: "০২",
-                  title: "মানি ম্যানেজমেন্ট মেনে চলুন",
-                  desc: "প্রতিটি ট্রেডে মোট ব্যালেন্সের ৫-১০% এর বেশি বিনিয়োগ করবেন না। একটানা লস হলে ট্রেড বন্ধ রাখুন।",
-                },
-                {
-                  num: "০৩",
-                  title: "OTC পেয়ারে মনোযোগ দিন",
-                  desc: "সপ্তাহান্তে বা মার্কেট বন্ধ থাকলে OTC (Over-the-Counter) পেয়ারে ট্রেড করুন। এগুলো ২৪/৭ চলে।",
-                },
-                {
-                  num: "০৪",
-                  title: "এক্সপায়ারি টাইম সঠিক রাখুন",
-                  desc: "সিগন্যালে উল্লিখিত এক্সপায়ারি টাইম মেনে চলুন (যেমন: ৩ মিনিট, ৫ মিনিট)। এটি না মানলে লস হওয়ার সম্ভাবনা বাড়ে।",
-                },
-              ].map((tip) => (
-                <div key={tip.num} className="flex gap-4">
-                  <div className="font-mono text-3xl font-bold text-border leading-none mt-0.5 shrink-0">
-                    {tip.num}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm text-foreground mb-1">
-                      {tip.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {tip.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Warning */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5"
-          >
-            <p className="text-xs font-semibold text-amber-400 mb-1">
-              ⚠️ ঝুঁকি সতর্কতা
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              ট্রেডিং ঝুঁকিপূর্ণ। সিগন্যালের নির্ভুলতা ৮৫-৯৪% হলেও ১০০% গ্যারান্টি নেই। শুধুমাত্র
-              সেই অর্থ বিনিয়োগ করুন যা হারালে আপনার আর্থিক ক্ষতি হবে না। নতুন ট্রেডারদের
-              প্রথমে ডেমো অ্যাকাউন্টে অভ্যাস করার পরামর্শ দেওয়া হচ্ছে।
-            </p>
-          </motion.div>
-        </div>
-      </section>
     </div>
   );
 }
 
+// ─── Payment Method Card ───────────────────────────────────────────────────────
 function PaymentMethodCard({
   method,
   icon,
@@ -843,6 +712,3 @@ function PaymentMethodCard({
     </div>
   );
 }
-
-// Silence unused import warning
-void TrendingDown;
