@@ -17,6 +17,13 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const Promotion = IDL.Record({
+  'id' : IDL.Text,
+  'bonusAmount' : IDL.Nat,
+  'description' : IDL.Text,
+  'isActive' : IDL.Bool,
+  'validUntil' : IDL.Int,
+});
 export const Signal = IDL.Record({
   'id' : IDL.Text,
   'direction' : SignalDirection,
@@ -35,9 +42,32 @@ export const User = IDL.Record({
   'id' : IDL.Text,
   'status' : UserStatus,
   'paymentMethod' : IDL.Text,
+  'balance' : IDL.Int,
+  'password' : IDL.Text,
   'name' : IDL.Text,
   'phone' : IDL.Text,
   'registeredAt' : IDL.Int,
+  'transactionId' : IDL.Text,
+});
+export const UserProfile = IDL.Record({
+  'status' : UserStatus,
+  'balance' : IDL.Int,
+  'name' : IDL.Text,
+  'phone' : IDL.Text,
+  'registeredAt' : IDL.Int,
+});
+export const DepositStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
+export const DepositRequest = IDL.Record({
+  'id' : IDL.Text,
+  'status' : DepositStatus,
+  'paymentMethod' : IDL.Text,
+  'userId' : IDL.Principal,
+  'createdAt' : IDL.Int,
+  'amount' : IDL.Nat,
   'transactionId' : IDL.Text,
 });
 export const PaymentInfo = IDL.Record({
@@ -49,23 +79,39 @@ export const PaymentInfo = IDL.Record({
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'activateUser' : IDL.Func([IDL.Text], [], []),
+  'addPromotion' : IDL.Func([IDL.Text, IDL.Nat, IDL.Int], [], []),
   'addSignal' : IDL.Func([IDL.Text, SignalDirection, IDL.Nat, IDL.Nat], [], []),
+  'approveDepositRequest' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createDepositRequest' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text], [], []),
   'deactivateUser' : IDL.Func([IDL.Text], [], []),
+  'deletePromotion' : IDL.Func([IDL.Text], [], []),
   'deleteSignal' : IDL.Func([IDL.Text], [], []),
+  'getActivePromotions' : IDL.Func([], [IDL.Vec(Promotion)], ['query']),
   'getActiveSignals' : IDL.Func([], [IDL.Vec(Signal)], ['query']),
   'getAllUsers' : IDL.Func([], [IDL.Vec(User)], ['query']),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getDepositRequests' : IDL.Func([], [IDL.Vec(DepositRequest)], ['query']),
   'getPaymentInfo' : IDL.Func([], [PaymentInfo], ['query']),
   'getPendingUsers' : IDL.Func([], [IDL.Vec(User)], ['query']),
-  'getSignals' : IDL.Func([IDL.Text], [IDL.Vec(Signal)], ['query']),
-  'getUserStatus' : IDL.Func([IDL.Text], [UserStatus], ['query']),
+  'getSignals' : IDL.Func([], [IDL.Vec(Signal)], ['query']),
+  'getUserBalance' : IDL.Func([], [IDL.Nat], ['query']),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
+  'getUserStatus' : IDL.Func([], [UserStatus], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'loginUser' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+  'processWithdrawalRequest' : IDL.Func([IDL.Principal, IDL.Nat], [], []),
   'registerUser' : IDL.Func(
-      [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
       [IDL.Bool],
       [],
     ),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'updatePaymentInfo' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
 });
 
@@ -77,6 +123,13 @@ export const idlFactory = ({ IDL }) => {
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const Promotion = IDL.Record({
+    'id' : IDL.Text,
+    'bonusAmount' : IDL.Nat,
+    'description' : IDL.Text,
+    'isActive' : IDL.Bool,
+    'validUntil' : IDL.Int,
   });
   const Signal = IDL.Record({
     'id' : IDL.Text,
@@ -96,9 +149,32 @@ export const idlFactory = ({ IDL }) => {
     'id' : IDL.Text,
     'status' : UserStatus,
     'paymentMethod' : IDL.Text,
+    'balance' : IDL.Int,
+    'password' : IDL.Text,
     'name' : IDL.Text,
     'phone' : IDL.Text,
     'registeredAt' : IDL.Int,
+    'transactionId' : IDL.Text,
+  });
+  const UserProfile = IDL.Record({
+    'status' : UserStatus,
+    'balance' : IDL.Int,
+    'name' : IDL.Text,
+    'phone' : IDL.Text,
+    'registeredAt' : IDL.Int,
+  });
+  const DepositStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
+  const DepositRequest = IDL.Record({
+    'id' : IDL.Text,
+    'status' : DepositStatus,
+    'paymentMethod' : IDL.Text,
+    'userId' : IDL.Principal,
+    'createdAt' : IDL.Int,
+    'amount' : IDL.Nat,
     'transactionId' : IDL.Text,
   });
   const PaymentInfo = IDL.Record({
@@ -110,27 +186,43 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'activateUser' : IDL.Func([IDL.Text], [], []),
+    'addPromotion' : IDL.Func([IDL.Text, IDL.Nat, IDL.Int], [], []),
     'addSignal' : IDL.Func(
         [IDL.Text, SignalDirection, IDL.Nat, IDL.Nat],
         [],
         [],
       ),
+    'approveDepositRequest' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createDepositRequest' : IDL.Func([IDL.Nat, IDL.Text, IDL.Text], [], []),
     'deactivateUser' : IDL.Func([IDL.Text], [], []),
+    'deletePromotion' : IDL.Func([IDL.Text], [], []),
     'deleteSignal' : IDL.Func([IDL.Text], [], []),
+    'getActivePromotions' : IDL.Func([], [IDL.Vec(Promotion)], ['query']),
     'getActiveSignals' : IDL.Func([], [IDL.Vec(Signal)], ['query']),
     'getAllUsers' : IDL.Func([], [IDL.Vec(User)], ['query']),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getDepositRequests' : IDL.Func([], [IDL.Vec(DepositRequest)], ['query']),
     'getPaymentInfo' : IDL.Func([], [PaymentInfo], ['query']),
     'getPendingUsers' : IDL.Func([], [IDL.Vec(User)], ['query']),
-    'getSignals' : IDL.Func([IDL.Text], [IDL.Vec(Signal)], ['query']),
-    'getUserStatus' : IDL.Func([IDL.Text], [UserStatus], ['query']),
+    'getSignals' : IDL.Func([], [IDL.Vec(Signal)], ['query']),
+    'getUserBalance' : IDL.Func([], [IDL.Nat], ['query']),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'getUserStatus' : IDL.Func([], [UserStatus], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'loginUser' : IDL.Func([IDL.Text, IDL.Text], [IDL.Bool], []),
+    'processWithdrawalRequest' : IDL.Func([IDL.Principal, IDL.Nat], [], []),
     'registerUser' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Text],
         [IDL.Bool],
         [],
       ),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'updatePaymentInfo' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   });
 };

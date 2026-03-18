@@ -10,10 +10,29 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface DepositRequest {
+  'id' : string,
+  'status' : DepositStatus,
+  'paymentMethod' : string,
+  'userId' : Principal,
+  'createdAt' : bigint,
+  'amount' : bigint,
+  'transactionId' : string,
+}
+export type DepositStatus = { 'pending' : null } |
+  { 'approved' : null } |
+  { 'rejected' : null };
 export interface PaymentInfo {
   'bkashNumber' : string,
   'binanceId' : string,
   'nagadNumber' : string,
+}
+export interface Promotion {
+  'id' : string,
+  'bonusAmount' : bigint,
+  'description' : string,
+  'isActive' : boolean,
+  'validUntil' : bigint,
 }
 export interface Signal {
   'id' : string,
@@ -30,10 +49,19 @@ export interface User {
   'id' : string,
   'status' : UserStatus,
   'paymentMethod' : string,
+  'balance' : bigint,
+  'password' : string,
   'name' : string,
   'phone' : string,
   'registeredAt' : bigint,
   'transactionId' : string,
+}
+export interface UserProfile {
+  'status' : UserStatus,
+  'balance' : bigint,
+  'name' : string,
+  'phone' : string,
+  'registeredAt' : bigint,
 }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -44,22 +72,37 @@ export type UserStatus = { 'active' : null } |
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'activateUser' : ActorMethod<[string], undefined>,
+  'addPromotion' : ActorMethod<[string, bigint, bigint], undefined>,
   'addSignal' : ActorMethod<
     [string, SignalDirection, bigint, bigint],
     undefined
   >,
+  'approveDepositRequest' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createDepositRequest' : ActorMethod<[bigint, string, string], undefined>,
   'deactivateUser' : ActorMethod<[string], undefined>,
+  'deletePromotion' : ActorMethod<[string], undefined>,
   'deleteSignal' : ActorMethod<[string], undefined>,
+  'getActivePromotions' : ActorMethod<[], Array<Promotion>>,
   'getActiveSignals' : ActorMethod<[], Array<Signal>>,
   'getAllUsers' : ActorMethod<[], Array<User>>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getDepositRequests' : ActorMethod<[], Array<DepositRequest>>,
   'getPaymentInfo' : ActorMethod<[], PaymentInfo>,
   'getPendingUsers' : ActorMethod<[], Array<User>>,
-  'getSignals' : ActorMethod<[string], Array<Signal>>,
-  'getUserStatus' : ActorMethod<[string], UserStatus>,
+  'getSignals' : ActorMethod<[], Array<Signal>>,
+  'getUserBalance' : ActorMethod<[], bigint>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'getUserStatus' : ActorMethod<[], UserStatus>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'registerUser' : ActorMethod<[string, string, string, string], boolean>,
+  'loginUser' : ActorMethod<[string, string], boolean>,
+  'processWithdrawalRequest' : ActorMethod<[Principal, bigint], undefined>,
+  'registerUser' : ActorMethod<
+    [string, string, string, string, string],
+    boolean
+  >,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'updatePaymentInfo' : ActorMethod<[string, string, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;

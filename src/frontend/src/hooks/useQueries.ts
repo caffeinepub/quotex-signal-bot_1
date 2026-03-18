@@ -1,16 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  type DepositRequest,
+  DepositStatus,
   type PaymentInfo,
+  type Promotion,
   type Signal,
   SignalDirection,
   type User,
+  type UserProfile,
   UserStatus,
 } from "../backend.d";
 import { useActor } from "./useActor";
 
 // ─── Re-export enums so pages can import from one place ──────────────────────
-export { SignalDirection, UserStatus };
-export type { Signal, User, PaymentInfo };
+export { SignalDirection, UserStatus, DepositStatus };
+export type {
+  Signal,
+  User,
+  PaymentInfo,
+  Promotion,
+  DepositRequest,
+  UserProfile,
+};
 
 // ─── Payment Info ─────────────────────────────────────────────────────────────
 export function usePaymentInfo() {
@@ -18,36 +29,54 @@ export function usePaymentInfo() {
   return useQuery<PaymentInfo>({
     queryKey: ["paymentInfo"],
     queryFn: async () => {
-      if (!actor) return { bkashNumber: "", nagadNumber: "", binanceId: "" };
+      if (!actor)
+        return {
+          bkashNumber: "01305211080",
+          nagadNumber: "01305211080",
+          binanceId: "",
+        };
       return actor.getPaymentInfo();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-// ─── User status ─────────────────────────────────────────────────────────────
-export function useUserStatus(userId: string) {
+// ─── User Profile ─────────────────────────────────────────────────────────────
+export function useCallerUserProfile() {
   const { actor, isFetching } = useActor();
-  return useQuery<UserStatus>({
-    queryKey: ["userStatus", userId],
+  return useQuery<UserProfile | null>({
+    queryKey: ["callerUserProfile"],
     queryFn: async () => {
-      if (!actor || !userId) return UserStatus.inactive;
-      return actor.getUserStatus(userId);
+      if (!actor) return null;
+      return actor.getCallerUserProfile();
     },
-    enabled: !!actor && !isFetching && userId.length > 0,
+    enabled: !!actor && !isFetching,
   });
 }
 
-// ─── Get signals for user ─────────────────────────────────────────────────────
-export function useSignals(userId: string, enabled: boolean) {
+// ─── Active Promotions ────────────────────────────────────────────────────────
+export function useActivePromotions() {
   const { actor, isFetching } = useActor();
-  return useQuery<Signal[]>({
-    queryKey: ["signals", userId],
+  return useQuery<Promotion[]>({
+    queryKey: ["activePromotions"],
     queryFn: async () => {
-      if (!actor || !userId) return [];
-      return actor.getSignals(userId);
+      if (!actor) return [];
+      return actor.getActivePromotions();
     },
-    enabled: !!actor && !isFetching && enabled && userId.length > 0,
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// ─── User status ─────────────────────────────────────────────────────────────
+export function useUserStatus() {
+  const { actor, isFetching } = useActor();
+  return useQuery<UserStatus>({
+    queryKey: ["userStatus"],
+    queryFn: async () => {
+      if (!actor) return UserStatus.inactive;
+      return actor.getUserStatus();
+    },
+    enabled: !!actor && !isFetching,
   });
 }
 
@@ -77,14 +106,14 @@ export function usePendingUsers() {
   });
 }
 
-// ─── Admin: active signals ────────────────────────────────────────────────────
-export function useActiveSignals() {
+// ─── Admin: deposit requests ──────────────────────────────────────────────────
+export function useDepositRequests() {
   const { actor, isFetching } = useActor();
-  return useQuery<Signal[]>({
-    queryKey: ["activeSignals"],
+  return useQuery<DepositRequest[]>({
+    queryKey: ["depositRequests"],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getActiveSignals();
+      return actor.getDepositRequests();
     },
     enabled: !!actor && !isFetching,
   });
@@ -110,16 +139,59 @@ export function useRegisterUser() {
     mutationFn: async ({
       name,
       phone,
+      password,
       paymentMethod,
       transactionId,
     }: {
       name: string;
       phone: string;
+      password: string;
       paymentMethod: string;
       transactionId: string;
     }) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.registerUser(name, phone, paymentMethod, transactionId);
+      return actor.registerUser(
+        name,
+        phone,
+        password,
+        paymentMethod,
+        transactionId,
+      );
+    },
+  });
+}
+
+export function useLoginUser() {
+  const { actor } = useActor();
+  return useMutation({
+    mutationFn: async ({
+      phone,
+      password,
+    }: { phone: string; password: string }) => {
+      if (!actor) throw new Error("Actor not ready");
+      return actor.loginUser(phone, password);
+    },
+  });
+}
+
+export function useCreateDepositRequest() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      amount,
+      paymentMethod,
+      transactionId,
+    }: {
+      amount: bigint;
+      paymentMethod: string;
+      transactionId: string;
+    }) => {
+      if (!actor) throw new Error("Actor not ready");
+      return actor.createDepositRequest(amount, paymentMethod, transactionId);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["callerUserProfile"] });
     },
   });
 }
@@ -153,40 +225,52 @@ export function useDeactivateUser() {
   });
 }
 
-export function useAddSignal() {
+export function useApproveDepositRequest() {
   const { actor } = useActor();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({
-      asset,
-      direction,
-      accuracy,
-      expiryMinutes,
-    }: {
-      asset: string;
-      direction: SignalDirection;
-      accuracy: bigint;
-      expiryMinutes: bigint;
-    }) => {
+    mutationFn: async (depositId: string) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.addSignal(asset, direction, accuracy, expiryMinutes);
+      return actor.approveDepositRequest(depositId);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["activeSignals"] });
+      qc.invalidateQueries({ queryKey: ["depositRequests"] });
     },
   });
 }
 
-export function useDeleteSignal() {
+export function useAddPromotion() {
   const { actor } = useActor();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (signalId: string) => {
+    mutationFn: async ({
+      description,
+      bonusAmount,
+      validUntil,
+    }: {
+      description: string;
+      bonusAmount: bigint;
+      validUntil: bigint;
+    }) => {
       if (!actor) throw new Error("Actor not ready");
-      return actor.deleteSignal(signalId);
+      return actor.addPromotion(description, bonusAmount, validUntil);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["activeSignals"] });
+      qc.invalidateQueries({ queryKey: ["activePromotions"] });
+    },
+  });
+}
+
+export function useDeletePromotion() {
+  const { actor } = useActor();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (promotionId: string) => {
+      if (!actor) throw new Error("Actor not ready");
+      return actor.deletePromotion(promotionId);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["activePromotions"] });
     },
   });
 }
@@ -199,11 +283,7 @@ export function useUpdatePaymentInfo() {
       bkash,
       nagad,
       binance,
-    }: {
-      bkash: string;
-      nagad: string;
-      binance: string;
-    }) => {
+    }: { bkash: string; nagad: string; binance: string }) => {
       if (!actor) throw new Error("Actor not ready");
       return actor.updatePaymentInfo(bkash, nagad, binance);
     },

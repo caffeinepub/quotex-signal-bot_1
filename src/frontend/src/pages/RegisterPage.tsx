@@ -1,493 +1,214 @@
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Check,
-  CheckCircle,
-  Copy,
-  Crown,
-  Gamepad2,
-  Loader2,
-} from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { CheckCircle, Copy, Loader2 } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useRegisterUser } from "../hooks/useQueries";
-import { BR_PACKAGES } from "./HomePage";
+
+const PAYMENT_NUMBERS = {
+  bkash: "01305211080",
+  nagad: "01305211080",
+};
 
 export default function RegisterPage() {
-  const { mutateAsync: registerUser, isPending } = useRegisterUser();
+  const navigate = useNavigate();
+  const registerMutation = useRegisterUser();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [ffUid, setFfUid] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
+  const [password, setPassword] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("bkash");
   const [transactionId, setTransactionId] = useState("");
-  const [selectedPackageMonths, setSelectedPackageMonths] = useState<number>(3);
-  const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const validate = () => {
-    const newErrors: Record<string, string> = {};
-    if (!name.trim()) newErrors.name = "নাম প্রয়োজন";
-    if (!phone.trim()) newErrors.phone = "ফোন নম্বর প্রয়োজন";
-    else if (!/^01[3-9]\d{8}$/.test(phone.trim()))
-      newErrors.phone = "সঠিক বাংলাদেশি ফোন নম্বর দিন";
-    if (!ffUid.trim()) newErrors.ffUid = "Free Fire UID প্রয়োজন";
-    if (!paymentMethod) newErrors.paymentMethod = "পেমেন্ট পদ্ধতি নির্বাচন করুন";
-    if (!transactionId.trim()) newErrors.transactionId = "ট্রানজেকশন ID প্রয়োজন";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  function copyNumber(num: string) {
+    navigator.clipboard.writeText(num);
+    toast.success("নম্বর কপি হয়েছে!");
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validate()) return;
-
     try {
-      const selectedPkg = BR_PACKAGES.find(
-        (p) => p.months === selectedPackageMonths,
-      );
-      const result = await registerUser({
-        name: name.trim(),
-        phone: phone.trim(),
+      const success = await registerMutation.mutateAsync({
+        name,
+        phone,
+        password,
         paymentMethod,
-        transactionId: `${transactionId.trim()}|uid:${ffUid.trim()}|pkg:${selectedPkg?.months}mo-${selectedPkg?.price}tk`,
+        transactionId,
       });
-      if (result) {
-        setSuccess(true);
-        toast.success("রেজিস্ট্রেশন সম্পন্ন হয়েছে!");
+      if (success) {
+        toast.success("রেজিস্ট্রেশন সফল! অ্যাডমিন অ্যাপ্রুভ করলে অ্যাক্সেস পাবেন।");
+        navigate({ to: "/login" });
       } else {
-        toast.error("ট্রানজেকশন ID যাচাই করা যায়নি");
+        toast.error("রেজিস্ট্রেশন ব্যর্থ। এই নম্বর ইতিমধ্যে রেজিস্টার্ড হতে পারে।");
       }
     } catch {
-      toast.error("রেজিস্ট্রেশন ব্যর্থ হয়েছে, আবার চেষ্টা করুন");
+      toast.error("রেজিস্ট্রেশন ব্যর্থ হয়েছে।");
     }
-  };
-
-  if (success) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-center max-w-md"
-          data-ocid="register.success_state"
-        >
-          <div className="w-20 h-20 rounded-full bg-signal-call-bg border border-signal-call/40 flex items-center justify-center mx-auto mb-6 glow-cyan">
-            <CheckCircle className="w-10 h-10 text-call" />
-          </div>
-          <h2 className="font-display text-3xl font-bold mb-3 neon-text">
-            রেজিস্ট্রেশন সম্পন্ন!
-          </h2>
-          <p className="text-muted-foreground leading-relaxed">
-            আপনার রেজিস্ট্রেশন সম্পন্ন হয়েছে। অ্যাডমিন অ্যাপ্রুভালের জন্য অপেক্ষা করুন। অ্যাপ্রুভালের
-            পর আপনি BR MODS প্যানেল অ্যাক্সেস পাবেন।
-          </p>
-          <div className="mt-6 p-4 bg-signal-call-bg/50 rounded-lg border border-signal-call/30">
-            <p className="text-sm text-muted-foreground">
-              আপনার ফোন নম্বর:{" "}
-              <span className="font-mono text-call font-semibold">{phone}</span>
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              প্যানেল অ্যাক্সেস চেক করতে এই নম্বরটি ব্যবহার করুন
-            </p>
-          </div>
-        </motion.div>
-      </div>
-    );
   }
 
   return (
-    <div className="py-10 px-4">
-      <div className="container mx-auto max-w-5xl">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 text-center"
-        >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Gamepad2 className="w-6 h-6 text-call" />
-            <h1 className="font-display text-3xl sm:text-4xl font-bold">
-              প্রিমিয়াম প্যাকেজ কিনুন
-            </h1>
-          </div>
-          <p className="text-muted-foreground text-sm">
-            পেমেন্ট করার পর নিচের ফর্ম পূরণ করুন
+    <div className="min-h-[calc(100vh-130px)] px-4 py-6 max-w-lg mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        {/* Payment Info */}
+        <div className="rounded-xl border border-border bg-card p-4 mb-5">
+          <p className="text-sm font-bold text-foreground mb-3">
+            💳 পেমেন্ট করুন
           </p>
-        </motion.div>
+          <p className="text-xs text-muted-foreground mb-3">
+            নিচের নম্বরে Personal Send করুন
+          </p>
 
-        {/* Package Selection */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-          className="mb-6 cyber-border rounded-2xl p-6"
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <Crown className="w-4 h-4 text-call" />
-            <h2 className="font-display text-lg font-semibold">
-              প্যাকেজ নির্বাচন করুন
-            </h2>
-          </div>
-          {/* 50% Offer mini-banner */}
-          <div className="mb-4 rounded-xl border border-orange-500/40 bg-gradient-to-r from-red-950/70 via-orange-950/60 to-red-950/70 px-4 py-3 text-center">
-            <p className="text-sm font-bold text-orange-300">
-              🔥 সীমিত সময়ের অফার — সকল প্যাকেজে{" "}
-              <span className="text-orange-400">৫০% ছাড়</span> চলছে!
-            </p>
-          </div>
-          <div
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
-            data-ocid="register.package.list"
-          >
-            {BR_PACKAGES.map((pkg) => (
+          {[
+            { label: "বিকাশ", num: PAYMENT_NUMBERS.bkash, color: "#e2136e" },
+            { label: "নগদ", num: PAYMENT_NUMBERS.nagad, color: "#f7941d" },
+          ].map((m) => (
+            <div
+              key={m.label}
+              className="flex items-center justify-between p-2.5 rounded-lg bg-background border border-border mb-2"
+            >
+              <div>
+                <span className="text-xs font-bold" style={{ color: m.color }}>
+                  {m.label}
+                </span>
+                <p className="font-mono font-bold text-foreground">{m.num}</p>
+                <p className="text-[10px] text-muted-foreground">
+                  Personal Send করুন
+                </p>
+              </div>
               <button
-                key={pkg.months}
                 type="button"
-                onClick={() => setSelectedPackageMonths(pkg.months)}
-                className={`relative rounded-xl p-4 border-2 text-center transition-all cursor-pointer ${
-                  selectedPackageMonths === pkg.months
-                    ? "border-signal-call bg-signal-call-bg glow-cyan"
-                    : "border-border bg-card hover:border-signal-call/40"
-                }`}
-                data-ocid={`register.package.item.${pkg.months}`}
+                onClick={() => copyNumber(m.num)}
+                className="p-2 rounded-lg hover:bg-accent transition-colors"
+                data-ocid="register.button"
               >
-                {/* 50% OFF badge */}
-                <div className="absolute -top-2.5 left-0 right-0 flex justify-center">
-                  <span className="bg-gradient-to-r from-red-600 to-orange-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
-                    ৫০% OFF
-                  </span>
-                </div>
-                {/* Strikethrough original price */}
-                <div className="text-[10px] text-muted-foreground line-through mt-1">
-                  ৳{pkg.originalPrice}
-                </div>
-                {/* Current price */}
-                <div className="font-display text-2xl font-bold text-call leading-tight">
-                  {pkg.price}
-                </div>
-                <div className="text-[10px] text-muted-foreground">টাকা</div>
-                <div className="font-semibold text-sm text-foreground mt-1">
-                  {pkg.label}
-                </div>
-                {selectedPackageMonths === pkg.months && (
-                  <Badge className="mt-2 bg-signal-call/20 text-call border-signal-call/40 text-[10px]">
-                    নির্বাচিত
-                  </Badge>
-                )}
+                <Copy className="w-4 h-4 text-muted-foreground" />
               </button>
-            ))}
+            </div>
+          ))}
+        </div>
+
+        {/* Registration Form */}
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="name">আপনার নাম</Label>
+            <Input
+              id="name"
+              placeholder="নাম লিখুন"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="bg-background"
+              data-ocid="register.input"
+            />
           </div>
-          <p className="text-xs text-muted-foreground mt-3 text-center">
-            নির্বাচিত প্যাকেজ:{" "}
-            <span className="text-call font-semibold">
-              {
-                BR_PACKAGES.find((p) => p.months === selectedPackageMonths)
-                  ?.label
-              }{" "}
-              —{" "}
-              {
-                BR_PACKAGES.find((p) => p.months === selectedPackageMonths)
-                  ?.price
-              }{" "}
-              টাকা
-            </span>
-          </p>
-        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          {/* Registration Form */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-3"
-          >
-            <div className="cyber-border rounded-2xl p-6 sm:p-8">
-              <h2 className="font-display text-xl font-semibold mb-6">
-                ব্যক্তিগত তথ্য
-              </h2>
-              <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Name */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="name" className="text-sm font-medium">
-                    পূর্ণ নাম <span className="text-put">*</span>
-                  </Label>
-                  <Input
-                    id="name"
-                    placeholder="আপনার পূর্ণ নাম লিখুন"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20"
-                    autoComplete="name"
-                    data-ocid="register.name_input"
-                  />
-                  {errors?.name && (
-                    <p
-                      className="text-xs text-destructive"
-                      data-ocid="register.name_error"
-                    >
-                      {errors.name}
-                    </p>
-                  )}
-                </div>
+          <div className="space-y-1">
+            <Label htmlFor="reg-phone">
+              যে নম্বর থেকে টাকা পাঠাবেন সেই নম্বর দিন
+            </Label>
+            <Input
+              id="reg-phone"
+              type="tel"
+              placeholder="01XXXXXXXXX"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              className="bg-background"
+              data-ocid="register.input"
+            />
+          </div>
 
-                {/* Phone */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="phone" className="text-sm font-medium">
-                    ফোন নম্বর <span className="text-put">*</span>
-                  </Label>
-                  <Input
-                    id="phone"
-                    placeholder="যে নম্বর থেকে টাকা পাঠাবেন সেই নম্বর দিন"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20"
-                    autoComplete="tel"
-                    inputMode="numeric"
-                    data-ocid="register.phone_input"
-                  />
-                  {errors?.phone && (
-                    <p
-                      className="text-xs text-destructive"
-                      data-ocid="register.phone_error"
-                    >
-                      {errors.phone}
-                    </p>
-                  )}
-                </div>
+          <div className="space-y-1">
+            <Label htmlFor="reg-password">পাসওয়ার্ড তৈরি করুন</Label>
+            <Input
+              id="reg-password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="bg-background"
+              data-ocid="register.input"
+            />
+          </div>
 
-                {/* Free Fire UID */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="ffuid" className="text-sm font-medium">
-                    Free Fire UID <span className="text-put">*</span>
-                  </Label>
-                  <Input
-                    id="ffuid"
-                    placeholder="আপনার FF UID লিখুন (যেমন: 123456789)"
-                    value={ffUid}
-                    onChange={(e) => setFfUid(e.target.value)}
-                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20 font-mono"
-                    inputMode="numeric"
-                    data-ocid="register.ffuid_input"
-                  />
-                  {errors?.ffUid && (
-                    <p
-                      className="text-xs text-destructive"
-                      data-ocid="register.ffuid_error"
-                    >
-                      {errors.ffUid}
-                    </p>
-                  )}
-                </div>
-
-                {/* Payment Method */}
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-medium">
-                    পেমেন্ট পদ্ধতি <span className="text-put">*</span>
-                  </Label>
-                  <Select
-                    value={paymentMethod}
-                    onValueChange={setPaymentMethod}
-                  >
-                    <SelectTrigger
-                      className="bg-muted/50 border-border focus:border-signal-call/50"
-                      data-ocid="register.payment_select"
-                    >
-                      <SelectValue placeholder="পেমেন্ট পদ্ধতি নির্বাচন করুন" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Bkash">💗 Bkash</SelectItem>
-                      <SelectItem value="Nagad">🟠 Nagad</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors?.paymentMethod && (
-                    <p
-                      className="text-xs text-destructive"
-                      data-ocid="register.payment_error"
-                    >
-                      {errors.paymentMethod}
-                    </p>
-                  )}
-                </div>
-
-                {/* Transaction ID */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="txid" className="text-sm font-medium">
-                    ট্রানজেকশন ID <span className="text-put">*</span>
-                  </Label>
-                  <Input
-                    id="txid"
-                    placeholder="পেমেন্টের ট্রানজেকশন ID লিখুন"
-                    value={transactionId}
-                    onChange={(e) => setTransactionId(e.target.value)}
-                    className="bg-muted/50 border-border focus:border-signal-call/50 focus:ring-signal-call/20 font-mono"
-                    data-ocid="register.txid_input"
-                  />
-                  {errors?.transactionId && (
-                    <p
-                      className="text-xs text-destructive"
-                      data-ocid="register.txid_error"
-                    >
-                      {errors.transactionId}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isPending}
-                  className="w-full bg-signal-call hover:bg-signal-call/90 text-background font-bold glow-cyan border-0 mt-2"
-                  data-ocid="register.submit_button"
+          <div className="space-y-1">
+            <Label>পেমেন্ট পদ্ধতি</Label>
+            <div className="flex gap-2">
+              {[
+                { v: "bkash", l: "বিকাশ", c: "#e2136e" },
+                { v: "nagad", l: "নগদ", c: "#f7941d" },
+              ].map((m) => (
+                <button
+                  key={m.v}
+                  type="button"
+                  onClick={() => setPaymentMethod(m.v)}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-semibold transition-all ${
+                    paymentMethod === m.v
+                      ? "border-current"
+                      : "border-border bg-card text-muted-foreground"
+                  }`}
+                  style={
+                    paymentMethod === m.v
+                      ? { color: m.c, borderColor: m.c, background: `${m.c}15` }
+                      : undefined
+                  }
+                  data-ocid="register.radio"
                 >
-                  {isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      রেজিস্ট্রেশন হচ্ছে...
-                    </>
-                  ) : (
-                    `রেজিস্ট্রেশন করুন (${BR_PACKAGES.find((p) => p.months === selectedPackageMonths)?.price} টাকা — ${BR_PACKAGES.find((p) => p.months === selectedPackageMonths)?.label})`
-                  )}
-                </Button>
-              </form>
+                  {m.l}
+                </button>
+              ))}
             </div>
-          </motion.div>
+          </div>
 
-          {/* Payment reference sidebar */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="lg:col-span-2 space-y-4"
+          <div className="space-y-1">
+            <Label htmlFor="txn">ট্রানজেকশন ID</Label>
+            <Input
+              id="txn"
+              placeholder="TXN ID লিখুন"
+              value={transactionId}
+              onChange={(e) => setTransactionId(e.target.value)}
+              required
+              className="bg-background"
+              data-ocid="register.input"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full font-bold text-black mt-2"
+            style={{ background: "oklch(0.76 0.13 85)" }}
+            disabled={registerMutation.isPending}
+            data-ocid="register.submit_button"
           >
-            <div className="cyber-border rounded-2xl p-6">
-              <h3 className="font-display text-lg font-semibold mb-1">
-                পেমেন্ট নম্বর
-              </h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                নিচের নম্বরে পেমেন্ট করুন এবং ট্রানজেকশন ID সংগ্রহ করুন
-              </p>
-              <div className="space-y-3">
-                <CopyablePaymentRow
-                  label="Bkash"
-                  icon="💗"
-                  value="01305211080"
-                  color="#e91e8c"
-                  sendType="Personal Send"
-                />
-                <CopyablePaymentRow
-                  label="Nagad"
-                  icon="🟠"
-                  value="01305211080"
-                  color="#f97316"
-                  sendType="Personal Send"
-                />
-              </div>
+            {registerMutation.isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            ) : (
+              <CheckCircle className="w-4 h-4 mr-2" />
+            )}
+            রেজিস্ট্রেশন সম্পন্ন করুন
+          </Button>
+        </form>
 
-              <div className="mt-4 p-3 rounded-lg border border-amber-500/30 bg-amber-500/10">
-                <p className="text-xs text-amber-400 font-semibold text-center">
-                  ⚠️ Finance অপশন ব্যবহার করবেন না
-                </p>
-                <p className="text-xs text-muted-foreground text-center mt-1">
-                  শুধুমাত্র Personal Send করুন
-                </p>
-              </div>
-            </div>
-
-            <div className="cyber-border rounded-xl p-4">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                ⚠️ পেমেন্টের পর রেজিস্ট্রেশন করুন। অ্যাডমিন যাচাই করার পর আপনার অ্যাকাউন্ট
-                সক্রিয় হবে এবং BR MODS প্যানেল অ্যাক্সেস পাবেন।
-              </p>
-            </div>
-
-            {/* Panel preview image */}
-            <div className="cyber-border rounded-xl overflow-hidden">
-              <img
-                src="/assets/uploads/images-2.jpeg"
-                alt="BR MODS Panel Preview"
-                className="w-full object-cover aspect-video"
-                loading="lazy"
-              />
-              <div className="p-3 text-center">
-                <p className="text-xs text-call font-mono font-semibold">
-                  BR MODS V2.0 Panel Preview
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Copyable Payment Row ──────────────────────────────────────────────────────
-function CopyablePaymentRow({
-  label,
-  icon,
-  value,
-  color,
-  sendType,
-}: {
-  label: string;
-  icon: string;
-  value: string;
-  color: string;
-  sendType?: string;
-}) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div
-      className="rounded-lg p-3 border"
-      style={{ borderColor: `${color}40`, background: `${color}0d` }}
-    >
-      <div className="flex items-center justify-between mb-1.5">
-        <div className="flex items-center gap-2">
-          <span>{icon}</span>
-          <p className="text-sm font-bold" style={{ color }}>
-            {label}
-          </p>
-        </div>
-        <button
-          onClick={handleCopy}
-          className="p-1.5 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-          title="কপি করুন"
-          type="button"
-          data-ocid="register.copy_button"
-        >
-          {copied ? (
-            <Check className="w-3.5 h-3.5 text-call" />
-          ) : (
-            <Copy className="w-3.5 h-3.5" />
-          )}
-        </button>
-      </div>
-      <p className="font-mono text-base font-bold text-foreground">{value}</p>
-      {sendType && (
-        <p className="text-xs mt-1" style={{ color }}>
-          ✅ {sendType} করুন
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          ইতিমধ্যে অ্যাকাউন্ট আছে?{" "}
+          <Link
+            to="/login"
+            className="font-semibold hover:underline"
+            style={{ color: "oklch(0.76 0.13 85)" }}
+            data-ocid="register.link"
+          >
+            লগইন করুন
+          </Link>
         </p>
-      )}
+      </motion.div>
     </div>
   );
 }

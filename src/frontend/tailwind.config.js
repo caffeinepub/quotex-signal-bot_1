@@ -9,22 +9,21 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
       fontFamily: {
-        display: ["Bricolage Grotesque", "sans-serif"],
-        body: ["Sora", "sans-serif"],
-        mono: ["Geist Mono", "monospace"],
+        display: ["'Noto Sans Bengali'", "'Bricolage Grotesque'", "sans-serif"],
+        body: ["'Noto Sans Bengali'", "'Plus Jakarta Sans'", "sans-serif"],
+        mono: ["'JetBrains Mono'", "monospace"],
       },
       colors: {
-        "signal-call": "oklch(var(--signal-call))",
-        "signal-put": "oklch(var(--signal-put))",
-        "signal-call-bg": "oklch(var(--signal-call-bg))",
-        "signal-put-bg": "oklch(var(--signal-put-bg))",
+        gold: "oklch(var(--gold))",
+        "gold-light": "oklch(var(--gold-light))",
+        "gold-dark": "oklch(var(--gold-dark))",
         border: "oklch(var(--border))",
         input: "oklch(var(--input))",
         ring: "oklch(var(--ring) / <alpha-value>)",
@@ -81,9 +80,6 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      boxShadow: {
-        xs: "0 1px 2px 0 rgba(0,0,0,0.05)",
-      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -93,10 +89,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "jackpot-pulse": {
+          "0%, 100%": { textShadow: "0 0 20px oklch(0.76 0.13 85 / 0.8)" },
+          "50%": { textShadow: "0 0 40px oklch(0.85 0.15 85 / 1), 0 0 60px oklch(0.76 0.13 85 / 0.6)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "jackpot-pulse": "jackpot-pulse 2s ease-in-out infinite",
       },
     },
   },
